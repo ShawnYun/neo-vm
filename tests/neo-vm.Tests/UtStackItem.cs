@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Neo.VM;
 using Neo.VM.Types;
 using System.Collections.Generic;
@@ -25,6 +25,9 @@ namespace Neo.Test
         public void NullTest()
         {
             StackItem nullItem = new byte[0];
+            Assert.AreNotEqual(nullItem, StackItem.Null);
+
+            nullItem = new Null();
             Assert.AreEqual(nullItem, StackItem.Null);
         }
 

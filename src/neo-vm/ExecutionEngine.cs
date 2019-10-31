@@ -1,4 +1,4 @@
-﻿using Neo.VM.Types;
+using Neo.VM.Types;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -62,13 +62,6 @@ namespace Neo.VM
         public ExecutionContext EntryContext => InvocationStack.Count > 0 ? InvocationStack.Peek(InvocationStack.Count - 1) : null;
         public VMState State { get; internal protected set; } = VMState.BREAK;
 
-        #region Events
-
-        public event EventHandler<ExecutionContext> ContextLoaded;
-        public event EventHandler<ExecutionContext> ContextUnloaded;
-
-        #endregion
-
         #region Limits
 
         /// <summary>
@@ -93,7 +86,7 @@ namespace Neo.VM
         /// <param name="value">Value</param>
         /// <returns>Return True if are allowed, otherwise False</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool CheckBigInteger(BigInteger value) => value.ToByteArray().Length <= MaxSizeForBigInteger;
+        public bool CheckBigInteger(BigInteger value) => value.GetByteCount() <= MaxSizeForBigInteger;
 
         /// <summary>
         /// Check if the number is allowed from SHL and SHR
@@ -169,6 +162,10 @@ namespace Neo.VM
         }
 
         #endregion
+
+        protected virtual void ContextUnloaded(ExecutionContext context)
+        {
+        }
 
         public virtual void Dispose()
         {
@@ -246,6 +243,12 @@ namespace Neo.VM
                             if (!CheckStackSize(true)) return false;
                             break;
                         }
+                    case OpCode.PUSHNULL:
+                        {
+                            context.EvaluationStack.Push(StackItem.Null);
+                            if (!CheckStackSize(true)) return false;
+                            break;
+                        }
 
                     // Control
                     case OpCode.NOP: break;
@@ -298,11 +301,11 @@ namespace Neo.VM
                                 context_pop.AltStack.CopyTo(CurrentContext.AltStack);
                             }
                             CheckStackSize(false, 0);
-                            ContextUnloaded?.Invoke(this, context_pop);
                             if (InvocationStack.Count == 0)
                             {
                                 State = VMState.HALT;
                             }
+                            ContextUnloaded(context_pop);
                             return true;
                         }
                     case OpCode.SYSCALL:
@@ -334,6 +337,13 @@ namespace Neo.VM
                     case OpCode.FROMALTSTACK:
                         {
                             context.EvaluationStack.Push(context.AltStack.Pop());
+                            break;
+                        }
+                    case OpCode.ISNULL:
+                        {
+                            bool b = context.EvaluationStack.Peek().IsNull;
+                            context.EvaluationStack.Set(0, b);
+                            CheckStackSize(false, 0);
                             break;
                         }
                     case OpCode.XDROP:
@@ -453,6 +463,7 @@ namespace Neo.VM
                         {
                             int count = (int)context.EvaluationStack.Pop().GetBigInteger();
                             if (count < 0) return false;
+                            if (count > MaxItemSize) count = (int)MaxItemSize;
                             int index = (int)context.EvaluationStack.Pop().GetBigInteger();
                             if (index < 0) return false;
                             byte[] x = context.EvaluationStack.Pop().GetByteArray();
@@ -907,31 +918,29 @@ namespace Neo.VM
                     case OpCode.NEWARRAY:
                     case OpCode.NEWSTRUCT:
                         {
-                            var item = context.EvaluationStack.Pop();
+                            var item = context.EvaluationStack.Peek();
 
                             if (item is VMArray array)
                             {
                                 // Allow to convert between array and struct
 
-                                VMArray result = null;
-
                                 if (array is Struct)
                                 {
                                     if (instruction.OpCode == OpCode.NEWSTRUCT)
-                                        result = array;
+                                        break;
                                 }
                                 else
                                 {
                                     if (instruction.OpCode == OpCode.NEWARRAY)
-                                        result = array;
+                                        break;
                                 }
 
-                                if (result is null)
-                                    result = instruction.OpCode == OpCode.NEWARRAY
-                                        ? new VMArray(array)
-                                        : new Struct(array);
+                                VMArray result = instruction.OpCode == OpCode.NEWARRAY
+                                    ? new VMArray(array)
+                                    : new Struct(array);
 
-                                context.EvaluationStack.Push(result);
+                                context.EvaluationStack.Set(0, result);
+                                if (!CheckStackSize(false, int.MaxValue)) return false;
                             }
                             else
                             {
@@ -950,8 +959,7 @@ namespace Neo.VM
                                     ? new VMArray(items)
                                     : new Struct(items);
 
-                                context.EvaluationStack.Push(result);
-
+                                context.EvaluationStack.Set(0, result);
                                 if (!CheckStackSize(true, count)) return false;
                             }
                             break;
@@ -1075,12 +1083,11 @@ namespace Neo.VM
             return true;
         }
 
-        private void LoadContext(ExecutionContext context)
+        protected virtual void LoadContext(ExecutionContext context)
         {
             if (InvocationStack.Count >= MaxInvocationStackSize)
                 throw new InvalidOperationException();
             InvocationStack.Push(context);
-            ContextLoaded?.Invoke(this, context);
         }
 
         public ExecutionContext LoadScript(byte[] script, int rvcount = -1)

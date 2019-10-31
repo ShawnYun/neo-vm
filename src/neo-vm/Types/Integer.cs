@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Numerics;
 
@@ -52,7 +52,7 @@ namespace Neo.VM.Types
         public override int GetByteLength()
         {
             if (_length == -1)
-                _length = GetByteArray().Length;
+                _length = value.GetByteCount();
             return _length;
         }
     }

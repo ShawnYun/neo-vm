@@ -66,7 +66,7 @@ namespace Neo.Test
         private void AssertResult(ExecutionEngine engine, VMUTExecutionEngineState result, string message)
         {
             AssertAreEqual(engine.State.ToString().ToLowerInvariant(), result.State.ToString().ToLowerInvariant(), message + "State is different");
-
+            if (engine.State == VMState.FAULT) return;
             AssertResult(engine.InvocationStack, result.InvocationStack, message + " [Invocation stack]");
             AssertResult(engine.ResultStack, result.ResultStack, message + " [Result stack] ");
         }
@@ -120,6 +120,12 @@ namespace Neo.Test
 
             switch (item.Type)
             {
+                case VMUTStackItemType.Null:
+                    {
+                        ret["type"] = VMUTStackItemType.Null.ToString();
+                        ret.Remove("value");
+                        break;
+                    }
                 case VMUTStackItemType.String:
                     {
                         // Easy access
@@ -189,6 +195,13 @@ namespace Neo.Test
 
             switch (item)
             {
+                case VM.Types.Null _:
+                    {
+                        return new JObject
+                        {
+                            ["type"] = type,
+                        };
+                    }
                 case VM.Types.Boolean v: value = new JValue(v.GetBoolean()); break;
                 case VM.Types.Integer v: value = new JValue(v.GetBigInteger().ToString()); break;
                 case VM.Types.ByteArray v: value = new JValue(v.GetByteArray()); break;
