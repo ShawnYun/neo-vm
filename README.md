@@ -1,8 +1,11 @@
 <p align="center">
-<img
-    src="https://neo-cdn.azureedge.net/images/neo_logo.svg"
-    width="250px">
+<a href="https://neo.org/">
+      <img
+      src="https://neo3.azureedge.net/images/logo%20files-dark.svg"
+      width="250px" alt="neo-logo">
+  </a>
 </p>
+
 
 <p align="center">
   <a href="https://travis-ci.com/neo-project/neo-vm">
@@ -11,9 +14,8 @@
   <a href="https://github.com/neo-project/neo-vm/releases">
     <img src="https://badge.fury.io/gh/neo-project%2Fneo-vm.svg" alt="Current neo-vm version.">
   </a>
-  <a href='https://coveralls.io/github/neo-project/neo-vm?branch=master'>
-    <img src='https://codecov.io/github/neo-project/neo-vm/branch/master/graph/badge.svg' 
-    alt='Current Coverage Status.' />
+  <a href='https://coveralls.io/github/neo-project/neo-vm'>
+    <img src='https://coveralls.io/repos/github/neo-project/neo-vm/badge.svg' alt='Coverage Status' />
   </a>
   <a href="https://github.com/neo-project/neo-vm">
     <img src="https://tokei.rs/b1/github/neo-project/neo-vm?category=lines" alt="total lines.">
@@ -27,4 +29,4 @@
 
 This is the virtual machine of NEO: **NeoVM**.
 
-For detailed documentation, see [docs.neo.org](http://docs.neo.org/en-us/sc/introduction.html) and the [NEO whitepaper](http://docs.neo.org/en-us/index.html).
+For detailed documentation, see [docs.neo.org](https://docs.neo.org/docs/en-us/index.html) and the [NEO whitepaper](https://docs.neo.org/docs/en-us/basic/whitepaper.html).

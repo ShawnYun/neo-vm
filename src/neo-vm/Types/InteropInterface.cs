@@ -3,48 +3,39 @@ using System.Diagnostics;
 
 namespace Neo.VM.Types
 {
-    public abstract class InteropInterface : StackItem
+    [DebuggerDisplay("Type={GetType().Name}, Value={_object}")]
+    public class InteropInterface : StackItem
     {
-        public override byte[] GetByteArray()
+        private readonly object _object;
+
+        public override StackItemType Type => StackItemType.InteropInterface;
+
+        public InteropInterface(object value)
+        {
+            _object = value ?? throw new ArgumentException();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj is InteropInterface i) return _object.Equals(i._object);
+            return false;
+        }
+
+        public override int GetHashCode()
         {
             throw new NotSupportedException();
         }
 
-        public abstract T GetInterface<T>() where T : class;
-    }
-
-    [DebuggerDisplay("Type={GetType().Name}, Value={_object}")]
-    public class InteropInterface<T> : InteropInterface
-        where T : class
-    {
-        private readonly T _object;
-
-        public InteropInterface(T value)
+        public T GetInterface<T>()
         {
-            _object = value;
+            if (_object is T t) return t;
+            throw new InvalidCastException();
         }
 
-        public override bool Equals(StackItem other)
+        public override bool ToBoolean()
         {
-            if (ReferenceEquals(this, other)) return true;
-            if (other is null) return false;
-            if (!(other is InteropInterface<T> i)) return false;
-            return _object.Equals(i._object);
-        }
-
-        public override bool GetBoolean()
-        {
-            return _object != null;
-        }
-
-        public override I GetInterface<I>()
-        {
-            return _object as I;
-        }
-
-        public static implicit operator T(InteropInterface<T> @interface)
-        {
-            return @interface._object;
+            return true;
         }
     }
 }

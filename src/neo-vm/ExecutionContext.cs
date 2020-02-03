@@ -8,7 +8,7 @@ namespace Neo.VM
     [DebuggerDisplay("RVCount={RVCount}, InstructionPointer={InstructionPointer}")]
     public sealed class ExecutionContext
     {
-        private readonly Dictionary<Type, object> states = new Dictionary<Type, object>();
+        private readonly Dictionary<Type, object> states;
 
         /// <summary>
         /// Number of items to be returned
@@ -23,12 +23,13 @@ namespace Neo.VM
         /// <summary>
         /// Evaluation stack
         /// </summary>
-        public RandomAccessStack<StackItem> EvaluationStack { get; }
+        public EvaluationStack EvaluationStack { get; }
 
-        /// <summary>
-        /// Alternative stack
-        /// </summary>
-        public RandomAccessStack<StackItem> AltStack { get; }
+        public Slot StaticFields { get; internal set; }
+
+        public Slot LocalVariables { get; internal set; }
+
+        public Slot Arguments { get; internal set; }
 
         /// <summary>
         /// Instruction pointer
@@ -56,56 +57,40 @@ namespace Neo.VM
             }
         }
 
-        public Script CallingScript { get; }
-
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="script">Script</param>
-        /// <param name="callingScript">The calling script</param>
         /// <param name="rvcount">Number of items to be returned</param>
-        internal ExecutionContext(Script script, Script callingScript, int rvcount)
-            : this(script, callingScript, rvcount, new RandomAccessStack<StackItem>(), new RandomAccessStack<StackItem>())
+        internal ExecutionContext(Script script, int rvcount, ReferenceCounter referenceCounter)
+            : this(script, rvcount, new EvaluationStack(referenceCounter), new Dictionary<Type, object>())
         {
         }
 
-        private ExecutionContext(Script script, Script callingScript, int rvcount, RandomAccessStack<StackItem> stack, RandomAccessStack<StackItem> alt)
+        private ExecutionContext(Script script, int rvcount, EvaluationStack stack, Dictionary<Type, object> states)
         {
             this.RVCount = rvcount;
             this.Script = script;
             this.EvaluationStack = stack;
-            this.AltStack = alt;
-            this.CallingScript = callingScript;
+            this.states = states;
         }
 
         internal ExecutionContext Clone()
         {
-            return new ExecutionContext(Script, Script, 0, EvaluationStack, AltStack);
+            return new ExecutionContext(Script, 0, EvaluationStack, states) { StaticFields = StaticFields };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Instruction GetInstruction(int ip) => Script.GetInstruction(ip);
 
-        public T GetState<T>()
+        public T GetState<T>() where T : class, new()
         {
-            return (T)states[typeof(T)];
-        }
-
-        public bool TryGetState<T>(out T value)
-        {
-            if (states.TryGetValue(typeof(T), out var val))
+            if (!states.TryGetValue(typeof(T), out object value))
             {
-                value = (T)val;
-                return true;
+                value = new T();
+                states[typeof(T)] = value;
             }
-
-            value = default;
-            return false;
-        }
-
-        public void SetState<T>(T state)
-        {
-            states[typeof(T)] = state;
+            return (T)value;
         }
 
         internal bool MoveNext()

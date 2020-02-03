@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -19,6 +20,9 @@ namespace Neo.Test
         public void TestOpCodesStack() => TestJson("./Tests/OpCodes/Stack");
 
         [TestMethod]
+        public void TestOpCodesSlot() => TestJson("./Tests/OpCodes/Slot");
+
+        [TestMethod]
         public void TestOpCodesSplice() => TestJson("./Tests/OpCodes/Splice");
 
         [TestMethod]
@@ -31,26 +35,42 @@ namespace Neo.Test
         public void TestOpCodesNumeric() => TestJson("./Tests/OpCodes/Numeric");
 
         [TestMethod]
-        public void TestOpCodesExceptions() => TestJson("./Tests/OpCodes/Exceptions");
+        public void TestOpCodesBitwiseLogic() => TestJson("./Tests/OpCodes/BitwiseLogic");
 
         [TestMethod]
-        public void TestOpCodesBitwiseLogic() => TestJson("./Tests/OpCodes/BitwiseLogic");
+        public void TestOpCodesTypes() => TestJson("./Tests/OpCodes/Types");
 
         private void TestJson(string path)
         {
             foreach (var file in Directory.GetFiles(path, "*.json", SearchOption.AllDirectories))
             {
-                var json = File.ReadAllText(file, Encoding.UTF8);
+                var realFile = Path.GetFullPath(file);
+                var json = File.ReadAllText(realFile, Encoding.UTF8);
                 var ut = json.DeserializeJson<VMUT>();
 
-                if (ut.Name != Path.GetFileNameWithoutExtension(file))
+                if (string.IsNullOrEmpty(ut.Name))
                 {
                     // Add filename
 
-                    ut.Name += $" [{Path.GetFileNameWithoutExtension(file)}]";
+                    ut.Name += $" [{Path.GetFileNameWithoutExtension(realFile)}]";
                 }
 
-                ExecuteTest(ut);
+                if (json != ut.ToJson().Replace("\r\n", "\n"))
+                {
+                    // Format json
+
+                    Console.WriteLine($"The file '{realFile}' was optimized");
+                    //File.WriteAllText(realFile, ut.ToJson().Replace("\r\n", "\n"), Encoding.UTF8);
+                }
+
+                try
+                {
+                    ExecuteTest(ut);
+                }
+                catch (Exception ex)
+                {
+                    throw new AggregateException("Error in file: " + realFile, ex);
+                }
             }
         }
     }

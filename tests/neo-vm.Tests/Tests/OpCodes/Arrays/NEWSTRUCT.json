@@ -1,224 +1,168 @@
 {
-    "category": "Arrays",
-    "name": "NEWSTRUCT",
-    "tests":
-    [
+  "category": "Arrays",
+  "name": "NEWSTRUCT",
+  "tests": [
+    {
+      "name": "Without push",
+      "script": [
+        "NEWSTRUCT"
+      ],
+      "steps": [
         {
-            "name": "Without push",
-            "script": "0xC6",
-            "steps":
-            [
-                {
-                    "actions":
-                    [
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Fault"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "With wrong type",
-            "script": "0xC7C6",
-            "steps":
-            [
-                {
-                    "actions":
-                    [
-                        "StepInto",
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Fault"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "With negative push",
-            "script": "0x4FC6",
-            "steps":
-            [
-                {
-                    "actions":
-                    [
-                        "StepInto",
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Fault"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Real test",
-            "script": "0x52C6",
-            "steps":
-            [
-                {
-                    "actions":
-                    [
-                        "StepInto",
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Break",
-                        "invocationStack":
-                        [
-                            {
-                                "instructionPointer": 2,
-                                "nextInstruction": "RET",
-                                "evaluationStack":
-                                [
-                                    {
-                                        "type": "Struct",
-                                        "value":
-                                        [
-                                            {
-                                                "type": "Boolean",
-                                                "value": false
-                                            },
-                                            {
-                                                "type": "Boolean",
-                                                "value": false
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "actions":
-                    [
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Halt",
-                        "resultStack":
-                        [
-                            {
-                                "type": "Struct",
-                                "value":
-                                [
-                                    {
-                                        "type": "Boolean",
-                                        "value": false
-                                    },
-                                    {
-                                        "type": "Boolean",
-                                        "value": false
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Real test [Clone Array to Struct]",
-            "script": "0x51C5760055C4C6",
-            "steps":
-            [
-                {
-                    "actions":
-                    [
-                        "StepInto",
-                        "StepInto",
-                        "StepInto",
-                        "StepInto",
-                        "StepInto",
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Break",
-                        "invocationStack":
-                        [
-                            {
-                                "instructionPointer": 6,
-                                "nextInstruction": "NEWSTRUCT",
-                                "evaluationStack":
-                                [
-                                    {
-                                        "type": "Array",
-                                        "value":
-                                        [
-                                            {
-                                                "type": "Integer",
-                                                "value": 5
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "actions":
-                    [
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Break",
-                        "invocationStack":
-                        [
-                            {
-                                "instructionPointer": 7,
-                                "nextInstruction": "RET",
-                                "evaluationStack":
-                                [
-                                    {
-                                        "type": "Struct",
-                                        "value":
-                                        [
-                                            {
-                                                "type": "Integer",
-                                                "value": 5
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "actions":
-                    [
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Halt",
-                        "resultStack":
-                        [
-                            {
-                                "type": "Struct",
-                                "value":
-                                [
-                                    {
-                                        "type": "Integer",
-                                        "value": 5
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
+          "actions": [
+            "stepInto"
+          ],
+          "result": {
+            "state": "FAULT"
+          }
         }
-    ]
+      ]
+    },
+    {
+      "name": "With wrong type",
+      "script": [
+        "NEWMAP",
+        "NEWSTRUCT"
+      ],
+      "steps": [
+        {
+          "actions": [
+            "stepInto",
+            "stepInto"
+          ],
+          "result": {
+            "state": "FAULT"
+          }
+        }
+      ]
+    },
+    {
+      "name": "With negative push",
+      "script": [
+        "PUSHM1",
+        "NEWSTRUCT"
+      ],
+      "steps": [
+        {
+          "actions": [
+            "stepInto",
+            "stepInto"
+          ],
+          "result": {
+            "state": "FAULT"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Real test",
+      "script": [
+        "PUSH2",
+        "NEWSTRUCT"
+      ],
+      "steps": [
+        {
+          "actions": [
+            "stepInto",
+            "stepInto"
+          ],
+          "result": {
+            "state": "BREAK",
+            "invocationStack": [
+              {
+                "instructionPointer": 2,
+                "nextInstruction": "RET",
+                "evaluationStack": [
+                  {
+                    "type": "struct",
+                    "value": [
+                      {
+                        "type": "Null"
+                      },
+                      {
+                        "type": "Null"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "actions": [
+            "stepInto"
+          ],
+          "result": {
+            "state": "HALT",
+            "resultStack": [
+              {
+                "type": "struct",
+                "value": [
+                  {
+                    "type": "Null"
+                  },
+                  {
+                    "type": "Null"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clone Array to Struct",
+      "script": [
+        "PUSH1",
+        "NEWARRAY",
+        "DUP",
+        "PUSH0",
+        "PUSH5",
+        "SETITEM",
+        "NEWSTRUCT"
+      ],
+      "steps": [
+        {
+          "actions": [
+            "stepInto",
+            "stepInto",
+            "stepInto",
+            "stepInto",
+            "stepInto",
+            "stepInto"
+          ],
+          "result": {
+            "state": "BREAK",
+            "invocationStack": [
+              {
+                "instructionPointer": 6,
+                "nextInstruction": "NEWSTRUCT",
+                "evaluationStack": [
+                  {
+                    "type": "array",
+                    "value": [
+                      {
+                        "type": "Integer",
+                        "value": 5
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "actions": [
+            "stepInto"
+          ],
+          "result": {
+            "state": "FAULT"
+          }
+        }
+      ]
+    }
+  ]
 }

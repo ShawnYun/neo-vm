@@ -1,5 +1,7 @@
 using System;
+using System.Buffers.Binary;
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -11,7 +13,7 @@ namespace Neo.VM
         public static Instruction RET { get; } = new Instruction(OpCode.RET);
 
         public readonly OpCode OpCode;
-        public readonly byte[] Operand;
+        public readonly ReadOnlyMemory<byte> Operand;
 
         private static readonly int[] OperandSizePrefixTable = new int[256];
         private static readonly int[] OperandSizeTable = new int[256];
@@ -33,7 +35,25 @@ namespace Neo.VM
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                return BitConverter.ToInt16(Operand, 0);
+                return BinaryPrimitives.ReadInt16LittleEndian(Operand.Span);
+            }
+        }
+
+        public int TokenI32
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                return BinaryPrimitives.ReadInt32LittleEndian(Operand.Span);
+            }
+        }
+
+        public sbyte TokenI8
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                return (sbyte)Operand.Span[0];
             }
         }
 
@@ -42,7 +62,16 @@ namespace Neo.VM
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                return Encoding.ASCII.GetString(Operand);
+                return Encoding.ASCII.GetString(Operand.Span);
+            }
+        }
+
+        public ushort TokenU16
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                return BinaryPrimitives.ReadUInt16LittleEndian(Operand.Span);
             }
         }
 
@@ -51,22 +80,38 @@ namespace Neo.VM
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                return BitConverter.ToUInt32(Operand, 0);
+                return BinaryPrimitives.ReadUInt32LittleEndian(Operand.Span);
+            }
+        }
+
+        public byte TokenU8
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                return Operand.Span[0];
+            }
+        }
+
+        public byte TokenU8_1
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                return Operand.Span[1];
             }
         }
 
         static Instruction()
         {
-            OperandSizePrefixTable[(int)OpCode.PUSHDATA1] = 1;
-            OperandSizePrefixTable[(int)OpCode.PUSHDATA2] = 2;
-            OperandSizePrefixTable[(int)OpCode.PUSHDATA4] = 4;
-            for (int i = (int)OpCode.PUSHBYTES1; i <= (int)OpCode.PUSHBYTES75; i++)
-                OperandSizeTable[i] = i;
-            OperandSizeTable[(int)OpCode.JMP] = 2;
-            OperandSizeTable[(int)OpCode.JMPIF] = 2;
-            OperandSizeTable[(int)OpCode.JMPIFNOT] = 2;
-            OperandSizeTable[(int)OpCode.CALL] = 2;
-            OperandSizeTable[(int)OpCode.SYSCALL] = 4;
+            foreach (FieldInfo field in typeof(OpCode).GetFields(BindingFlags.Public | BindingFlags.Static))
+            {
+                OperandSizeAttribute attribute = field.GetCustomAttribute<OperandSizeAttribute>();
+                if (attribute == null) continue;
+                int index = (int)(OpCode)field.GetValue(null);
+                OperandSizePrefixTable[index] = attribute.SizePrefix;
+                OperandSizeTable[index] = attribute.Size;
+            }
         }
 
         private Instruction(OpCode opcode)
@@ -97,10 +142,9 @@ namespace Neo.VM
             if (operandSize > 0)
             {
                 ip += operandSizePrefix;
-                Operand = new byte[operandSize];
                 if (ip + operandSize > script.Length)
                     throw new InvalidOperationException();
-                Unsafe.MemoryCopy(script, ip, Operand, 0, operandSize);
+                Operand = new ReadOnlyMemory<byte>(script, ip, operandSize);
             }
         }
     }

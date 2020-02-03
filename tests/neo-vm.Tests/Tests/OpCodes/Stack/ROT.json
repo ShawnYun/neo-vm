@@ -1,209 +1,193 @@
-{
-    "category": "Stack",
-    "name": "ROT",
-    "tests":
-    [
+﻿{
+  "category": "Stack",
+  "name": "ROT",
+  "tests": [
+    {
+      "name": "Without push",
+      "script": [
+        "ROT"
+      ],
+      "steps": [
         {
-            "name": "Without push",
-            "script": "0x7B",
-            "steps":
-            [
-                {
-                    "actions":
-                    [
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Fault"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "With one push",
-            "script": "0x007B",
-            "steps":
-            [
-                {
-                    "actions":
-                    [
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Break",
-                        "invocationStack":
-                        [
-                            {
-                                "instructionPointer": 1,
-                                "nextInstruction": "ROT",
-                                "evaluationStack":
-                                [
-                                    {
-                                        "type": "ByteArray",
-                                        "value": ""
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "actions":
-                    [
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Fault"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "With 2 items",
-            "script": "0x51527B",
-            "steps":
-            [
-                {
-                    "actions":
-                    [
-                        "StepInto",
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Break",
-                        "invocationStack":
-                        [
-                            {
-                                "instructionPointer": 2,
-                                "nextInstruction": "ROT",
-                                "evaluationStack":
-                                [
-                                    {
-                                        "type": "Integer",
-                                        "value": 2
-                                    },
-                                    {
-                                        "type": "Integer",
-                                        "value": 1
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "actions":
-                    [
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Fault"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Real test with 3 items",
-            "script": "0x5152537B",
-            "steps":
-            [
-                {
-                    "actions":
-                    [
-                        "StepInto",
-                        "StepInto",
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Break",
-                        "invocationStack":
-                        [
-                            {
-                                "instructionPointer": 3,
-                                "nextInstruction": "ROT",
-                                "evaluationStack":
-                                [
-                                    {
-                                        "type": "Integer",
-                                        "value": 3
-                                    },
-                                    {
-                                        "type": "Integer",
-                                        "value": 2
-                                    },
-                                    {
-                                        "type": "Integer",
-                                        "value": 1
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "actions":
-                    [
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Break",
-                        "invocationStack":
-                        [
-                            {
-                                "instructionPointer": 4,
-                                "nextInstruction": "RET",
-                                "evaluationStack":
-                                [
-                                    {
-                                        "type": "Integer",
-                                        "value": 1
-                                    },
-                                    {
-                                        "type": "Integer",
-                                        "value": 3
-                                    },
-                                    {
-                                        "type": "Integer",
-                                        "value": 2
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "actions":
-                    [
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Halt",
-                        "resultStack":
-                        [
-                            {
-                                "type": "Integer",
-                                "value": 1
-                            },
-                            {
-                                "type": "Integer",
-                                "value": 3
-                            },
-                            {
-                                "type": "Integer",
-                                "value": 2
-                            }
-                        ]
-                    }
-                }
-            ]
+          "actions": [
+            "stepInto"
+          ],
+          "result": {
+            "state": "FAULT"
+          }
         }
-    ]
+      ]
+    },
+    {
+      "name": "With one push",
+      "script": [
+        "PUSH0",
+        "ROT"
+      ],
+      "steps": [
+        {
+          "actions": [
+            "stepInto"
+          ],
+          "result": {
+            "state": "BREAK",
+            "invocationStack": [
+              {
+                "instructionPointer": 1,
+                "nextInstruction": "ROT",
+                "evaluationStack": [
+                  {
+                    "type": "integer",
+                    "value": 0
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "actions": [
+            "stepInto"
+          ],
+          "result": {
+            "state": "FAULT"
+          }
+        }
+      ]
+    },
+    {
+      "name": "With 2 items",
+      "script": [
+        "PUSH1",
+        "PUSH2",
+        "ROT"
+      ],
+      "steps": [
+        {
+          "actions": [
+            "stepInto",
+            "stepInto"
+          ],
+          "result": {
+            "state": "BREAK",
+            "invocationStack": [
+              {
+                "instructionPointer": 2,
+                "nextInstruction": "ROT",
+                "evaluationStack": [
+                  {
+                    "type": "integer",
+                    "value": 2
+                  },
+                  {
+                    "type": "integer",
+                    "value": 1
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "actions": [
+            "stepInto"
+          ],
+          "result": {
+            "state": "FAULT"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Real test with 3 items",
+      "script": [
+        "PUSH1",
+        "PUSH2",
+        "PUSH3",
+        "ROT"
+      ],
+      "steps": [
+        {
+          "actions": [
+            "stepInto",
+            "stepInto",
+            "stepInto"
+          ],
+          "result": {
+            "state": "BREAK",
+            "invocationStack": [
+              {
+                "instructionPointer": 3,
+                "nextInstruction": "ROT",
+                "evaluationStack": [
+                  {
+                    "type": "integer",
+                    "value": 3
+                  },
+                  {
+                    "type": "integer",
+                    "value": 2
+                  },
+                  {
+                    "type": "integer",
+                    "value": 1
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "actions": [
+            "stepInto"
+          ],
+          "result": {
+            "state": "BREAK",
+            "invocationStack": [
+              {
+                "instructionPointer": 4,
+                "nextInstruction": "RET",
+                "evaluationStack": [
+                  {
+                    "type": "integer",
+                    "value": 1
+                  },
+                  {
+                    "type": "integer",
+                    "value": 3
+                  },
+                  {
+                    "type": "integer",
+                    "value": 2
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "actions": [
+            "stepInto"
+          ],
+          "result": {
+            "state": "HALT",
+            "resultStack": [
+              {
+                "type": "integer",
+                "value": 1
+              },
+              {
+                "type": "integer",
+                "value": 3
+              },
+              {
+                "type": "integer",
+                "value": 2
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
 }

@@ -21,21 +21,49 @@ namespace Neo.Test
 
                 var debugger = new Debugger(engine);
 
-                Assert.IsNull(engine.CurrentContext.CallingScript);
+                Assert.IsFalse(debugger.RemoveBreakPoint(engine.CurrentContext.Script, 3));
+                Assert.IsFalse(debugger.RemoveBreakPoint(engine.CurrentContext.Script, 4));
+
                 Assert.AreEqual(OpCode.NOP, engine.CurrentContext.NextInstruction.OpCode);
 
                 debugger.AddBreakPoint(engine.CurrentContext.Script, 3);
                 debugger.AddBreakPoint(engine.CurrentContext.Script, 4);
                 debugger.Execute();
 
-                Assert.IsNull(engine.CurrentContext.CallingScript);
                 Assert.AreEqual(OpCode.RET, engine.CurrentContext.NextInstruction.OpCode);
                 Assert.AreEqual(3, engine.CurrentContext.InstructionPointer);
                 Assert.AreEqual(VMState.BREAK, engine.State);
 
-                debugger.RemoveBreakPoint(engine.CurrentContext.Script, 4);
+                Assert.IsTrue(debugger.RemoveBreakPoint(engine.CurrentContext.Script, 3));
+                Assert.IsFalse(debugger.RemoveBreakPoint(engine.CurrentContext.Script, 3));
+                Assert.IsTrue(debugger.RemoveBreakPoint(engine.CurrentContext.Script, 4));
+                Assert.IsFalse(debugger.RemoveBreakPoint(engine.CurrentContext.Script, 4));
                 debugger.Execute();
 
+                Assert.AreEqual(VMState.HALT, engine.State);
+            }
+        }
+
+        [TestMethod]
+        public void TestWithoutBreakPoints()
+        {
+            using (var engine = new ExecutionEngine())
+            using (var script = new ScriptBuilder())
+            {
+                script.Emit(OpCode.NOP);
+                script.Emit(OpCode.NOP);
+                script.Emit(OpCode.NOP);
+                script.Emit(OpCode.NOP);
+
+                engine.LoadScript(script.ToArray());
+
+                var debugger = new Debugger(engine);
+
+                Assert.AreEqual(OpCode.NOP, engine.CurrentContext.NextInstruction.OpCode);
+
+                debugger.Execute();
+
+                Assert.IsNull(engine.CurrentContext);
                 Assert.AreEqual(VMState.HALT, engine.State);
             }
         }
@@ -53,7 +81,6 @@ namespace Neo.Test
 
                 engine.LoadScript(script.ToArray());
 
-                Assert.IsNull(engine.CurrentContext.CallingScript);
                 Assert.AreEqual(OpCode.NOP, engine.CurrentContext.NextInstruction.OpCode);
 
                 engine.Execute();
@@ -74,7 +101,7 @@ namespace Neo.Test
                    │  │  RET
                    └> │  PUSH0  
                     └─┘  RET */
-                script.EmitJump(OpCode.CALL, 5);
+                script.EmitCall(4);
                 script.Emit(OpCode.NOT);
                 script.Emit(OpCode.RET);
                 script.Emit(OpCode.PUSH0);
@@ -84,19 +111,17 @@ namespace Neo.Test
 
                 var debugger = new Debugger(engine);
 
-                Assert.IsNull(engine.CurrentContext.CallingScript);
                 Assert.AreEqual(OpCode.NOT, engine.CurrentContext.NextInstruction.OpCode);
 
                 Assert.AreEqual(VMState.BREAK, debugger.StepOver());
 
-                Assert.IsNull(engine.CurrentContext.CallingScript);
-                Assert.AreEqual(3, engine.CurrentContext.InstructionPointer);
+                Assert.AreEqual(2, engine.CurrentContext.InstructionPointer);
                 Assert.AreEqual(VMState.BREAK, engine.State);
                 Assert.AreEqual(OpCode.RET, engine.CurrentContext.NextInstruction.OpCode);
 
                 debugger.Execute();
 
-                Assert.AreEqual(true, engine.ResultStack.Pop().GetBoolean());
+                Assert.AreEqual(true, engine.ResultStack.Pop().ToBoolean());
                 Assert.AreEqual(VMState.HALT, engine.State);
 
                 // Test step over again
@@ -117,7 +142,7 @@ namespace Neo.Test
                    │  │  RET
                    └> │  PUSH0
                     └─┘  RET */
-                script.EmitJump(OpCode.CALL, 5);
+                script.EmitCall(4);
                 script.Emit(OpCode.NOT);
                 script.Emit(OpCode.RET);
                 script.Emit(OpCode.PUSH0);
@@ -131,14 +156,12 @@ namespace Neo.Test
 
                 Assert.AreEqual(context, engine.CurrentContext);
                 Assert.AreEqual(context, engine.EntryContext);
-                Assert.IsNull(engine.CurrentContext.CallingScript);
                 Assert.AreEqual(OpCode.NOT, engine.CurrentContext.NextInstruction.OpCode);
 
                 Assert.AreEqual(VMState.BREAK, debugger.StepInto());
 
                 Assert.AreNotEqual(context, engine.CurrentContext);
                 Assert.AreEqual(context, engine.EntryContext);
-                Assert.AreEqual(engine.EntryContext.Script, engine.CurrentContext.CallingScript);
                 Assert.AreEqual(OpCode.RET, engine.CurrentContext.NextInstruction.OpCode);
 
                 Assert.AreEqual(VMState.BREAK, debugger.StepInto());
@@ -146,13 +169,12 @@ namespace Neo.Test
 
                 Assert.AreEqual(context, engine.CurrentContext);
                 Assert.AreEqual(context, engine.EntryContext);
-                Assert.IsNull(engine.CurrentContext.CallingScript);
                 Assert.AreEqual(OpCode.RET, engine.CurrentContext.NextInstruction.OpCode);
 
                 Assert.AreEqual(VMState.BREAK, debugger.StepInto());
                 Assert.AreEqual(VMState.HALT, debugger.StepInto());
 
-                Assert.AreEqual(true, engine.ResultStack.Pop().GetBoolean());
+                Assert.AreEqual(true, engine.ResultStack.Pop().ToBoolean());
                 Assert.AreEqual(VMState.HALT, engine.State);
 
                 // Test step into again
@@ -173,7 +195,7 @@ namespace Neo.Test
                    │  │  RET
                    └>X│  PUSH0
                      └┘  RET */
-                script.EmitJump(OpCode.CALL, 5);
+                script.EmitCall(4);
                 script.Emit(OpCode.NOT);
                 script.Emit(OpCode.RET);
                 script.Emit(OpCode.PUSH0);
@@ -183,20 +205,18 @@ namespace Neo.Test
 
                 var debugger = new Debugger(engine);
 
-                Assert.IsNull(engine.CurrentContext.CallingScript);
                 Assert.AreEqual(OpCode.NOT, engine.CurrentContext.NextInstruction.OpCode);
 
                 debugger.AddBreakPoint(engine.CurrentContext.Script, 5);
                 Assert.AreEqual(VMState.BREAK, debugger.StepOver());
 
-                Assert.AreEqual(engine.EntryContext.Script, engine.CurrentContext.CallingScript);
                 Assert.AreEqual(OpCode.RET, engine.CurrentContext.NextInstruction.OpCode);
                 Assert.AreEqual(5, engine.CurrentContext.InstructionPointer);
                 Assert.AreEqual(VMState.BREAK, engine.State);
 
                 debugger.Execute();
 
-                Assert.AreEqual(true, engine.ResultStack.Pop().GetBoolean());
+                Assert.AreEqual(true, engine.ResultStack.Pop().ToBoolean());
                 Assert.AreEqual(VMState.HALT, engine.State);
             }
         }

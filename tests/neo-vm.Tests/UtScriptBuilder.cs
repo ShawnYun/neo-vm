@@ -3,6 +3,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Neo.Test.Extensions;
 using Neo.Test.Helpers;
 using Neo.VM;
 
@@ -20,13 +21,13 @@ namespace Neo.Test
                 script.Emit(OpCode.NOP);
                 Assert.AreEqual(1, script.Offset);
 
-                CollectionAssert.AreEqual(new byte[] { 0x61 }, script.ToArray());
+                CollectionAssert.AreEqual(new byte[] { 0x21 }, script.ToArray());
             }
 
             using (var script = new ScriptBuilder())
             {
                 script.Emit(OpCode.NOP, new byte[] { 0x66 });
-                CollectionAssert.AreEqual(new byte[] { 0x61, 0x66 }, script.ToArray());
+                CollectionAssert.AreEqual(new byte[] { 0x21, 0x66 }, script.ToArray());
             }
         }
 
@@ -41,22 +42,72 @@ namespace Neo.Test
         }
 
         [TestMethod]
+        public void TestEmitCall()
+        {
+            using (var script = new ScriptBuilder())
+            {
+                script.EmitCall(0);
+                CollectionAssert.AreEqual(new[] { (byte)OpCode.CALL, (byte)0 }, script.ToArray());
+            }
+            using (var script = new ScriptBuilder())
+            {
+                script.EmitCall(12345);
+                CollectionAssert.AreEqual(new[] { (byte)OpCode.CALL_L }.Concat(BitConverter.GetBytes(12345)).ToArray(), script.ToArray());
+            }
+            using (var script = new ScriptBuilder())
+            {
+                script.EmitCall(-12345);
+                CollectionAssert.AreEqual(new[] { (byte)OpCode.CALL_L }.Concat(BitConverter.GetBytes(-12345)).ToArray(), script.ToArray());
+            }
+        }
+
+        [TestMethod]
         public void TestEmitJump()
         {
-            var offset = RandomHelper.RandInt16();
+            var offset_i8 = sbyte.MaxValue;
+            var offset_i32 = int.MaxValue;
 
             foreach (OpCode op in Enum.GetValues(typeof(OpCode)))
             {
                 using (var script = new ScriptBuilder())
                 {
-                    if (op != OpCode.JMP && op != OpCode.JMPIF && op != OpCode.JMPIFNOT && op != OpCode.CALL)
+                    if (op < OpCode.JMP || op > OpCode.JMPLE_L)
                     {
-                        Assert.ThrowsException<ArgumentException>(() => script.EmitJump(op, offset));
+                        Assert.ThrowsException<ArgumentOutOfRangeException>(() => script.EmitJump(op, offset_i8));
+                        Assert.ThrowsException<ArgumentOutOfRangeException>(() => script.EmitJump(op, offset_i32));
                     }
                     else
                     {
-                        script.EmitJump(op, offset);
-                        CollectionAssert.AreEqual(new byte[] { (byte)op }.Concat(BitConverter.GetBytes(offset)).ToArray(), script.ToArray());
+                        script.EmitJump(op, offset_i8);
+                        script.EmitJump(op, offset_i32);
+                        if ((int)op % 2 == 0)
+                            CollectionAssert.AreEqual(new[] { (byte)op, (byte)offset_i8, (byte)(op + 1) }.Concat(BitConverter.GetBytes(offset_i32)).ToArray(), script.ToArray());
+                        else
+                            CollectionAssert.AreEqual(new[] { (byte)op }.Concat(BitConverter.GetBytes((int)offset_i8)).Concat(new[] { (byte)op }).Concat(BitConverter.GetBytes(offset_i32)).ToArray(), script.ToArray());
+                    }
+                }
+            }
+
+            offset_i8 = sbyte.MinValue;
+            offset_i32 = int.MinValue;
+
+            foreach (OpCode op in Enum.GetValues(typeof(OpCode)))
+            {
+                using (var script = new ScriptBuilder())
+                {
+                    if (op < OpCode.JMP || op > OpCode.JMPLE_L)
+                    {
+                        Assert.ThrowsException<ArgumentOutOfRangeException>(() => script.EmitJump(op, offset_i8));
+                        Assert.ThrowsException<ArgumentOutOfRangeException>(() => script.EmitJump(op, offset_i32));
+                    }
+                    else
+                    {
+                        script.EmitJump(op, offset_i8);
+                        script.EmitJump(op, offset_i32);
+                        if ((int)op % 2 == 0)
+                            CollectionAssert.AreEqual(new[] { (byte)op, (byte)offset_i8, (byte)(op + 1) }.Concat(BitConverter.GetBytes(offset_i32)).ToArray(), script.ToArray());
+                        else
+                            CollectionAssert.AreEqual(new[] { (byte)op }.Concat(BitConverter.GetBytes((int)offset_i8)).Concat(new[] { (byte)op }).Concat(BitConverter.GetBytes(offset_i32)).ToArray(), script.ToArray());
                     }
                 }
             }
@@ -68,13 +119,13 @@ namespace Neo.Test
             using (var script = new ScriptBuilder())
             {
                 script.EmitPush(BigInteger.MinusOne);
-                CollectionAssert.AreEqual(new byte[] { 0x4F }, script.ToArray());
+                CollectionAssert.AreEqual(new byte[] { 0x0F }, script.ToArray());
             }
 
             using (var script = new ScriptBuilder())
             {
                 script.EmitPush(BigInteger.Zero);
-                CollectionAssert.AreEqual(new byte[] { 0x00 }, script.ToArray());
+                CollectionAssert.AreEqual(new byte[] { 0x10 }, script.ToArray());
             }
 
             for (byte x = 1; x <= 16; x++)
@@ -82,29 +133,26 @@ namespace Neo.Test
                 using (var script = new ScriptBuilder())
                 {
                     script.EmitPush(new BigInteger(x));
-                    CollectionAssert.AreEqual(new byte[] { (byte)(OpCode.PUSH1 - 1 + x) }, script.ToArray());
+                    CollectionAssert.AreEqual(new byte[] { (byte)(OpCode.PUSH0 + x) }, script.ToArray());
                 }
             }
 
-            foreach (BigInteger test in new BigInteger[]
-                {
-                byte.MaxValue,
-                short.MinValue, short.MaxValue,
-                int.MinValue, int.MaxValue,
-                long.MinValue, long.MaxValue,
-                sbyte.MinValue, sbyte.MaxValue,
-                ushort.MaxValue,
-                uint.MaxValue,
-                new BigInteger(ulong.MaxValue)
-                }
-            )
-            {
-                using (var script = new ScriptBuilder())
-                {
-                    script.EmitPush(test);
-                    CollectionAssert.AreEqual(new byte[] { (byte)test.ToByteArray().Length }.Concat(test.ToByteArray()).ToArray(), script.ToArray());
-                }
-            }
+            CollectionAssert.AreEqual("0080".FromHexString(), new ScriptBuilder().EmitPush(sbyte.MinValue).ToArray());
+            CollectionAssert.AreEqual("007f".FromHexString(), new ScriptBuilder().EmitPush(sbyte.MaxValue).ToArray());
+            CollectionAssert.AreEqual("01ff00".FromHexString(), new ScriptBuilder().EmitPush(byte.MaxValue).ToArray());
+            CollectionAssert.AreEqual("010080".FromHexString(), new ScriptBuilder().EmitPush(short.MinValue).ToArray());
+            CollectionAssert.AreEqual("01ff7f".FromHexString(), new ScriptBuilder().EmitPush(short.MaxValue).ToArray());
+            CollectionAssert.AreEqual("02ffff0000".FromHexString(), new ScriptBuilder().EmitPush(ushort.MaxValue).ToArray());
+            CollectionAssert.AreEqual("0200000080".FromHexString(), new ScriptBuilder().EmitPush(int.MinValue).ToArray());
+            CollectionAssert.AreEqual("02ffffff7f".FromHexString(), new ScriptBuilder().EmitPush(int.MaxValue).ToArray());
+            CollectionAssert.AreEqual("03ffffffff00000000".FromHexString(), new ScriptBuilder().EmitPush(uint.MaxValue).ToArray());
+            CollectionAssert.AreEqual("030000000000000080".FromHexString(), new ScriptBuilder().EmitPush(long.MinValue).ToArray());
+            CollectionAssert.AreEqual("03ffffffffffffff7f".FromHexString(), new ScriptBuilder().EmitPush(long.MaxValue).ToArray());
+            CollectionAssert.AreEqual("04ffffffffffffffff0000000000000000".FromHexString(), new ScriptBuilder().EmitPush(ulong.MaxValue).ToArray());
+            CollectionAssert.AreEqual("050100000000000000feffffffffffffff00000000000000000000000000000000".FromHexString(), new ScriptBuilder().EmitPush(new BigInteger(ulong.MaxValue) * new BigInteger(ulong.MaxValue)).ToArray());
+
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => new ScriptBuilder().EmitPush(
+                new BigInteger("050100000000000000feffffffffffffff0100000000000000feffffffffffffff00000000000000000000000000000000".FromHexString())));
         }
 
         [TestMethod]
@@ -113,13 +161,13 @@ namespace Neo.Test
             using (var script = new ScriptBuilder())
             {
                 script.EmitPush(true);
-                CollectionAssert.AreEqual(new byte[] { (byte)OpCode.PUSHT }, script.ToArray());
+                CollectionAssert.AreEqual(new byte[] { (byte)OpCode.PUSH1 }, script.ToArray());
             }
 
             using (var script = new ScriptBuilder())
             {
                 script.EmitPush(false);
-                CollectionAssert.AreEqual(new byte[] { (byte)OpCode.PUSHF }, script.ToArray());
+                CollectionAssert.AreEqual(new byte[] { (byte)OpCode.PUSH0 }, script.ToArray());
             }
         }
 
@@ -129,17 +177,6 @@ namespace Neo.Test
             using (var script = new ScriptBuilder())
             {
                 Assert.ThrowsException<ArgumentNullException>(() => script.EmitPush((byte[])null));
-            }
-
-            for (byte x = 0; x < 0x4B; x++)
-            {
-                using (var script = new ScriptBuilder())
-                {
-                    var data = RandomHelper.RandBuffer(x);
-
-                    script.EmitPush(data);
-                    CollectionAssert.AreEqual(new byte[] { x }.Concat(data).ToArray(), script.ToArray());
-                }
             }
 
             using (var script = new ScriptBuilder())
@@ -173,17 +210,6 @@ namespace Neo.Test
             using (var script = new ScriptBuilder())
             {
                 Assert.ThrowsException<ArgumentNullException>(() => script.EmitPush((string)null));
-            }
-
-            for (byte x = 0; x < 0x4B; x++)
-            {
-                using (var script = new ScriptBuilder())
-                {
-                    var data = RandomHelper.RandString(x);
-
-                    script.EmitPush(data);
-                    CollectionAssert.AreEqual(new byte[] { x }.Concat(Encoding.UTF8.GetBytes(data)).ToArray(), script.ToArray());
-                }
             }
 
             using (var script = new ScriptBuilder())

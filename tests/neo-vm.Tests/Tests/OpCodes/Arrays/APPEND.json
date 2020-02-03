@@ -1,705 +1,679 @@
 {
-    "category": "Arrays",
-    "name": "APPEND",
-    "tests":
-    [
+  "category": "Arrays",
+  "name": "APPEND",
+  "tests": [
+    {
+      "name": "Without push",
+      "script": [
+        "PUSH1",
+        "APPEND"
+      ],
+      "steps": [
         {
-            "name": "Without push",
-            "script": "0x51C8",
-            "steps":
-            [
-                {
-                    "actions":
-                    [
-                        "Execute"
-                    ],
-                    "result":
-                    {
-                        "state": "Fault"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Without array",
-            "script": "0x5152C8",
-            "steps":
-            [
-                {
-                    "actions":
-                    [
-                        "Execute"
-                    ],
-                    "result":
-                    {
-                        "state": "Fault"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Clone test [Array]",
-            "script": "0x00C57655C86B00C5766DC86D56C86C",
-            "steps":
-            [
-                {
-                    "actions":
-                    [
-                        "StepInto",
-                        "StepInto",
-                        "StepInto",
-                        "StepInto",
-                        "StepInto",
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Break",
-                        "invocationStack":
-                        [
-                            {
-                                "instructionPointer": 6,
-                                "nextInstruction": "PUSH0",
-                                "altStack":
-                                [
-                                    {
-                                        "type": "Array",
-                                        "value":
-                                        [
-                                            {
-                                                "type": "Integer",
-                                                "value": 5
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "actions":
-                    [
-                        "StepInto",
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Break",
-                        "invocationStack":
-                        [
-                            {
-                                "instructionPointer": 8,
-                                "nextInstruction": "DUP",
-                                "evaluationStack":
-                                [
-                                    {
-                                        "type": "Array",
-                                        "value":
-                                        [
-                                        ]
-                                    }
-                                ],
-                                "altStack":
-                                [
-                                    {
-                                        "type": "Array",
-                                        "value":
-                                        [
-                                            {
-                                                "type": "Integer",
-                                                "value": 5
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "actions":
-                    [
-                        "StepInto",
-                        "StepInto",
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Break",
-                        "invocationStack":
-                        [
-                            {
-                                "instructionPointer": 11,
-                                "nextInstruction": "DUPFROMALTSTACK",
-                                "evaluationStack":
-                                [
-                                    {
-                                        "type": "Array",
-                                        "value":
-                                        [
-                                            {
-                                                "type": "Array",
-                                                "value":
-                                                [
-                                                    {
-                                                        "type": "Integer",
-                                                        "value": "5"
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                ],
-                                "altStack":
-                                [
-                                    {
-                                        "type": "Array",
-                                        "value":
-                                        [
-                                            {
-                                                "type": "Integer",
-                                                "value": "5"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "actions":
-                    [
-                        "StepInto",
-                        "StepInto",
-                        "StepInto",
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Break",
-                        "invocationStack":
-                        [
-                            {
-                                "instructionPointer": 15,
-                                "nextInstruction": "RET",
-                                "evaluationStack":
-                                [
-                                    {
-                                        "type": "Array",
-                                        "value":
-                                        [
-                                            {
-                                                "type": "Integer",
-                                                "value": "5"
-                                            },
-                                            {
-                                                "type": "Integer",
-                                                "value": "6"
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "type": "Array",
-                                        "value":
-                                        [
-                                            {
-                                                "type": "Array",
-                                                "value":
-                                                [
-                                                    {
-                                                        "type": "Integer",
-                                                        "value": "5"
-                                                    },
-                                                    {
-                                                        "type": "Integer",
-                                                        "value": "6"
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "actions":
-                    [
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Halt",
-                        "resultStack":
-                        [
-                            {
-                                "type": "Array",
-                                "value":
-                                [
-                                    {
-                                        "type": "Integer",
-                                        "value": "5"
-                                    },
-                                    {
-                                        "type": "Integer",
-                                        "value": "6"
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "Array",
-                                "value":
-                                [
-                                    {
-                                        "type": "Array",
-                                        "value":
-                                        [
-                                            {
-                                                "type": "Integer",
-                                                "value": "5"
-                                            },
-                                            {
-                                                "type": "Integer",
-                                                "value": "6"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Clone test [Struct]",
-            "script": "0x00C67655C86B00C6766DC86D56C86C",
-            "steps":
-            [
-                {
-                    "actions":
-                    [
-                        "StepInto",
-                        "StepInto",
-                        "StepInto",
-                        "StepInto",
-                        "StepInto",
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Break",
-                        "invocationStack":
-                        [
-                            {
-                                "instructionPointer": 6,
-                                "nextInstruction": "PUSH0",
-                                "altStack":
-                                [
-                                    {
-                                        "type": "Struct",
-                                        "value":
-                                        [
-                                            {
-                                                "type": "Integer",
-                                                "value": 5
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "actions":
-                    [
-                        "StepInto",
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Break",
-                        "invocationStack":
-                        [
-                            {
-                                "instructionPointer": 8,
-                                "nextInstruction": "DUP",
-                                "evaluationStack":
-                                [
-                                    {
-                                        "type": "Struct",
-                                        "value":
-                                        [
-                                        ]
-                                    }
-                                ],
-                                "altStack":
-                                [
-                                    {
-                                        "type": "Struct",
-                                        "value":
-                                        [
-                                            {
-                                                "type": "Integer",
-                                                "value": 5
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "actions":
-                    [
-                        "StepInto",
-                        "StepInto",
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Break",
-                        "invocationStack":
-                        [
-                            {
-                                "instructionPointer": 11,
-                                "nextInstruction": "DUPFROMALTSTACK",
-                                "evaluationStack":
-                                [
-                                    {
-                                        "type": "Struct",
-                                        "value":
-                                        [
-                                            {
-                                                "type": "Struct",
-                                                "value":
-                                                [
-                                                    {
-                                                        "type": "Integer",
-                                                        "value": 5
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                ],
-                                "altStack":
-                                [
-                                    {
-                                        "type": "Struct",
-                                        "value":
-                                        [
-                                            {
-                                                "type": "Integer",
-                                                "value": 5
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "actions":
-                    [
-                        "StepInto",
-                        "StepInto",
-                        "StepInto",
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Break",
-                        "invocationStack":
-                        [
-                            {
-                                "instructionPointer": 15,
-                                "nextInstruction": "RET",
-                                "evaluationStack":
-                                [
-                                    {
-                                        "type": "Struct",
-                                        "value":
-                                        [
-                                            {
-                                                "type": "Integer",
-                                                "value": 5
-                                            },
-                                            {
-                                                "type": "Integer",
-                                                "value": 6
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "type": "Struct",
-                                        "value":
-                                        [
-                                            {
-                                                "type": "Struct",
-                                                "value":
-                                                [
-                                                    {
-                                                        "type": "Integer",
-                                                        "value": 5
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "actions":
-                    [
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Halt",
-                        "resultStack":
-                        [
-                            {
-                                "type": "Struct",
-                                "value":
-                                [
-                                    {
-                                        "type": "Integer",
-                                        "value": 5
-                                    },
-                                    {
-                                        "type": "Integer",
-                                        "value": 6
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "Struct",
-                                "value":
-                                [
-                                    {
-                                        "type": "Struct",
-                                        "value":
-                                        [
-                                            {
-                                                "type": "Integer",
-                                                "value": 5
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Real test [Array]",
-            "script": "0x00C57655C8",
-            "steps":
-            [
-                {
-                    "actions":
-                    [
-                        "StepInto",
-                        "StepInto",
-                        "StepInto",
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Break",
-                        "invocationStack":
-                        [
-                            {
-                                "instructionPointer": 4,
-                                "nextInstruction": "APPEND",
-                                "evaluationStack":
-                                [
-                                    {
-                                        "type": "Integer",
-                                        "value": 5
-                                    },
-                                    {
-                                        "type": "Array",
-                                        "value":
-                                        [
-                                        ]
-                                    },
-                                    {
-                                        "type": "Array",
-                                        "value":
-                                        [
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "actions":
-                    [
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Break",
-                        "invocationStack":
-                        [
-                            {
-                                "instructionPointer": 5,
-                                "nextInstruction": "RET",
-                                "evaluationStack":
-                                [
-                                    {
-                                        "type": "Array",
-                                        "value":
-                                        [
-                                            {
-                                                "type": "Integer",
-                                                "value": "5"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "actions":
-                    [
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Halt",
-                        "resultStack":
-                        [
-                            {
-                                "type": "Array",
-                                "value":
-                                [
-                                    {
-                                        "type": "Integer",
-                                        "value": "5"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Real test [Struct]",
-            "script": "0x00C67655C8",
-            "steps":
-            [
-                {
-                    "actions":
-                    [
-                        "StepInto",
-                        "StepInto",
-                        "StepInto",
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Break",
-                        "invocationStack":
-                        [
-                            {
-                                "instructionPointer": 4,
-                                "nextInstruction": "APPEND",
-                                "evaluationStack":
-                                [
-                                    {
-                                        "type": "Integer",
-                                        "value": 5
-                                    },
-                                    {
-                                        "type": "Struct",
-                                        "value":
-                                        [
-                                        ]
-                                    },
-                                    {
-                                        "type": "Struct",
-                                        "value":
-                                        [
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "actions":
-                    [
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Break",
-                        "invocationStack":
-                        [
-                            {
-                                "instructionPointer": 5,
-                                "nextInstruction": "RET",
-                                "evaluationStack":
-                                [
-                                    {
-                                        "type": "Struct",
-                                        "value":
-                                        [
-                                            {
-                                                "type": "Integer",
-                                                "value": "5"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "actions":
-                    [
-                        "StepInto"
-                    ],
-                    "result":
-                    {
-                        "state": "Halt",
-                        "resultStack":
-                        [
-                            {
-                                "type": "Struct",
-                                "value":
-                                [
-                                    {
-                                        "type": "Integer",
-                                        "value": "5"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
+          "actions": [
+            "execute"
+          ],
+          "result": {
+            "state": "FAULT"
+          }
         }
-    ]
+      ]
+    },
+    {
+      "name": "Without array",
+      "script": [
+        "PUSH1",
+        "PUSH2",
+        "APPEND"
+      ],
+      "steps": [
+        {
+          "actions": [
+            "execute"
+          ],
+          "result": {
+            "state": "FAULT"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clone test [Array]",
+      "script": [
+        "INITSSLOT",
+        "01",
+        "PUSH0",
+        "NEWARRAY",
+        "DUP",
+        "PUSH5",
+        "APPEND",
+        "STSFLD0",
+        "PUSH0",
+        "NEWARRAY",
+        "DUP",
+        "LDSFLD0",
+        "APPEND",
+        "LDSFLD0",
+        "PUSH6",
+        "APPEND",
+        "LDSFLD0"
+      ],
+      "steps": [
+        {
+          "actions": [
+            "stepInto",
+            "stepInto",
+            "stepInto",
+            "stepInto",
+            "stepInto",
+            "stepInto",
+            "stepInto"
+          ],
+          "result": {
+            "state": "BREAK",
+            "invocationStack": [
+              {
+                "instructionPointer": 8,
+                "nextInstruction": "PUSH0",
+                "staticFields": [
+                  {
+                    "type": "array",
+                    "value": [
+                      {
+                        "type": "Integer",
+                        "value": 5
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "actions": [
+            "stepInto",
+            "stepInto"
+          ],
+          "result": {
+            "state": "BREAK",
+            "invocationStack": [
+              {
+                "instructionPointer": 10,
+                "nextInstruction": "DUP",
+                "evaluationStack": [
+                  {
+                    "type": "array",
+                    "value": []
+                  }
+                ],
+                "staticFields": [
+                  {
+                    "type": "array",
+                    "value": [
+                      {
+                        "type": "Integer",
+                        "value": 5
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "actions": [
+            "stepInto",
+            "stepInto",
+            "stepInto"
+          ],
+          "result": {
+            "state": "BREAK",
+            "invocationStack": [
+              {
+                "instructionPointer": 13,
+                "nextInstruction": "LDSFLD0",
+                "evaluationStack": [
+                  {
+                    "type": "array",
+                    "value": [
+                      {
+                        "type": "Array",
+                        "value": [
+                          {
+                            "type": "Integer",
+                            "value": "5"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "staticFields": [
+                  {
+                    "type": "array",
+                    "value": [
+                      {
+                        "type": "Integer",
+                        "value": "5"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "actions": [
+            "stepInto",
+            "stepInto",
+            "stepInto",
+            "stepInto"
+          ],
+          "result": {
+            "state": "BREAK",
+            "invocationStack": [
+              {
+                "instructionPointer": 17,
+                "nextInstruction": "RET",
+                "evaluationStack": [
+                  {
+                    "type": "array",
+                    "value": [
+                      {
+                        "type": "Integer",
+                        "value": "5"
+                      },
+                      {
+                        "type": "Integer",
+                        "value": "6"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "array",
+                    "value": [
+                      {
+                        "type": "Array",
+                        "value": [
+                          {
+                            "type": "Integer",
+                            "value": "5"
+                          },
+                          {
+                            "type": "Integer",
+                            "value": "6"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "staticFields": [
+                  {
+                    "type": "array",
+                    "value": [
+                      {
+                        "type": "Integer",
+                        "value": "5"
+                      },
+                      {
+                        "type": "Integer",
+                        "value": "6"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "actions": [
+            "stepInto"
+          ],
+          "result": {
+            "state": "HALT",
+            "resultStack": [
+              {
+                "type": "array",
+                "value": [
+                  {
+                    "type": "Integer",
+                    "value": "5"
+                  },
+                  {
+                    "type": "Integer",
+                    "value": "6"
+                  }
+                ]
+              },
+              {
+                "type": "array",
+                "value": [
+                  {
+                    "type": "Array",
+                    "value": [
+                      {
+                        "type": "Integer",
+                        "value": "5"
+                      },
+                      {
+                        "type": "Integer",
+                        "value": "6"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clone test [Struct]",
+      "script": [
+        "INITSSLOT",
+        "01",
+        "PUSH0",
+        "NEWSTRUCT",
+        "DUP",
+        "PUSH5",
+        "APPEND",
+        "STSFLD0",
+        "PUSH0",
+        "NEWSTRUCT",
+        "DUP",
+        "LDSFLD0",
+        "APPEND",
+        "LDSFLD0",
+        "PUSH6",
+        "APPEND",
+        "LDSFLD0"
+      ],
+      "steps": [
+        {
+          "actions": [
+            "stepInto",
+            "stepInto",
+            "stepInto",
+            "stepInto",
+            "stepInto",
+            "stepInto",
+            "stepInto"
+          ],
+          "result": {
+            "state": "BREAK",
+            "invocationStack": [
+              {
+                "instructionPointer": 8,
+                "nextInstruction": "PUSH0",
+                "staticFields": [
+                  {
+                    "type": "struct",
+                    "value": [
+                      {
+                        "type": "Integer",
+                        "value": 5
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "actions": [
+            "stepInto",
+            "stepInto"
+          ],
+          "result": {
+            "state": "BREAK",
+            "invocationStack": [
+              {
+                "instructionPointer": 10,
+                "nextInstruction": "DUP",
+                "evaluationStack": [
+                  {
+                    "type": "struct",
+                    "value": []
+                  }
+                ],
+                "staticFields": [
+                  {
+                    "type": "struct",
+                    "value": [
+                      {
+                        "type": "Integer",
+                        "value": 5
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "actions": [
+            "stepInto",
+            "stepInto",
+            "stepInto"
+          ],
+          "result": {
+            "state": "BREAK",
+            "invocationStack": [
+              {
+                "instructionPointer": 13,
+                "nextInstruction": "LDSFLD0",
+                "evaluationStack": [
+                  {
+                    "type": "struct",
+                    "value": [
+                      {
+                        "type": "Struct",
+                        "value": [
+                          {
+                            "type": "Integer",
+                            "value": 5
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "staticFields": [
+                  {
+                    "type": "struct",
+                    "value": [
+                      {
+                        "type": "Integer",
+                        "value": 5
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "actions": [
+            "stepInto",
+            "stepInto",
+            "stepInto",
+            "stepInto"
+          ],
+          "result": {
+            "state": "BREAK",
+            "invocationStack": [
+              {
+                "instructionPointer": 17,
+                "nextInstruction": "RET",
+                "evaluationStack": [
+                  {
+                    "type": "struct",
+                    "value": [
+                      {
+                        "type": "Integer",
+                        "value": 5
+                      },
+                      {
+                        "type": "Integer",
+                        "value": 6
+                      }
+                    ]
+                  },
+                  {
+                    "type": "struct",
+                    "value": [
+                      {
+                        "type": "Struct",
+                        "value": [
+                          {
+                            "type": "Integer",
+                            "value": 5
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "staticFields": [
+                  {
+                    "type": "struct",
+                    "value": [
+                      {
+                        "type": "Integer",
+                        "value": 5
+                      },
+                      {
+                        "type": "Integer",
+                        "value": 6
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "actions": [
+            "stepInto"
+          ],
+          "result": {
+            "state": "HALT",
+            "resultStack": [
+              {
+                "type": "struct",
+                "value": [
+                  {
+                    "type": "Integer",
+                    "value": 5
+                  },
+                  {
+                    "type": "Integer",
+                    "value": 6
+                  }
+                ]
+              },
+              {
+                "type": "struct",
+                "value": [
+                  {
+                    "type": "Struct",
+                    "value": [
+                      {
+                        "type": "Integer",
+                        "value": 5
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Real test [Array]",
+      "script": [
+        "PUSH0",
+        "NEWARRAY",
+        "DUP",
+        "PUSH5",
+        "APPEND"
+      ],
+      "steps": [
+        {
+          "actions": [
+            "stepInto",
+            "stepInto",
+            "stepInto",
+            "stepInto"
+          ],
+          "result": {
+            "state": "BREAK",
+            "invocationStack": [
+              {
+                "instructionPointer": 4,
+                "nextInstruction": "APPEND",
+                "evaluationStack": [
+                  {
+                    "type": "integer",
+                    "value": 5
+                  },
+                  {
+                    "type": "array",
+                    "value": []
+                  },
+                  {
+                    "type": "array",
+                    "value": []
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "actions": [
+            "stepInto"
+          ],
+          "result": {
+            "state": "BREAK",
+            "invocationStack": [
+              {
+                "instructionPointer": 5,
+                "nextInstruction": "RET",
+                "evaluationStack": [
+                  {
+                    "type": "array",
+                    "value": [
+                      {
+                        "type": "Integer",
+                        "value": "5"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "actions": [
+            "stepInto"
+          ],
+          "result": {
+            "state": "HALT",
+            "resultStack": [
+              {
+                "type": "array",
+                "value": [
+                  {
+                    "type": "Integer",
+                    "value": "5"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Real test [Struct]",
+      "script": [
+        "PUSH0",
+        "NEWSTRUCT",
+        "DUP",
+        "PUSH5",
+        "APPEND"
+      ],
+      "steps": [
+        {
+          "actions": [
+            "stepInto",
+            "stepInto",
+            "stepInto",
+            "stepInto"
+          ],
+          "result": {
+            "state": "BREAK",
+            "invocationStack": [
+              {
+                "instructionPointer": 4,
+                "nextInstruction": "APPEND",
+                "evaluationStack": [
+                  {
+                    "type": "integer",
+                    "value": 5
+                  },
+                  {
+                    "type": "struct",
+                    "value": []
+                  },
+                  {
+                    "type": "struct",
+                    "value": []
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "actions": [
+            "stepInto"
+          ],
+          "result": {
+            "state": "BREAK",
+            "invocationStack": [
+              {
+                "instructionPointer": 5,
+                "nextInstruction": "RET",
+                "evaluationStack": [
+                  {
+                    "type": "struct",
+                    "value": [
+                      {
+                        "type": "Integer",
+                        "value": "5"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "actions": [
+            "stepInto"
+          ],
+          "result": {
+            "state": "HALT",
+            "resultStack": [
+              {
+                "type": "struct",
+                "value": [
+                  {
+                    "type": "Integer",
+                    "value": "5"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
 }

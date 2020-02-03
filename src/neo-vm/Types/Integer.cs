@@ -1,59 +1,81 @@
 using System;
 using System.Diagnostics;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace Neo.VM.Types
 {
     [DebuggerDisplay("Type={GetType().Name}, Value={value}")]
-    public class Integer : StackItem
+    public class Integer : PrimitiveType
     {
-        private static readonly byte[] ZeroBytes = new byte[0];
+        public const int MaxSize = 32;
 
-        private int _length = -1;
+        public static readonly Integer Zero = 0;
         private readonly BigInteger value;
+
+        internal override ReadOnlyMemory<byte> Memory => value.IsZero ? ReadOnlyMemory<byte>.Empty : value.ToByteArray();
+        public override int Size { get; }
+        public override StackItemType Type => StackItemType.Integer;
 
         public Integer(BigInteger value)
         {
+            if (value.IsZero)
+            {
+                Size = 0;
+            }
+            else
+            {
+                Size = value.GetByteCount();
+                if (Size > MaxSize) throw new ArgumentException();
+            }
             this.value = value;
         }
 
-        public override bool Equals(StackItem other)
+        public override bool Equals(PrimitiveType other)
         {
             if (ReferenceEquals(this, other)) return true;
-            if (other is null) return false;
             if (other is Integer i) return value == i.value;
-            byte[] bytes_other;
-            try
-            {
-                bytes_other = other.GetByteArray();
-            }
-            catch (NotSupportedException)
-            {
-                return false;
-            }
-            return Unsafe.MemoryEquals(GetByteArray(), bytes_other);
+            return base.Equals(other);
         }
 
-        public override BigInteger GetBigInteger()
+        public override BigInteger ToBigInteger()
         {
             return value;
         }
 
-        public override bool GetBoolean()
+        public override bool ToBoolean()
         {
             return !value.IsZero;
         }
 
-        public override byte[] GetByteArray()
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator Integer(int value)
         {
-            return value.IsZero ? ZeroBytes : value.ToByteArray();
+            return (BigInteger)value;
         }
 
-        public override int GetByteLength()
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator Integer(uint value)
         {
-            if (_length == -1)
-                _length = value.GetByteCount();
-            return _length;
+            return (BigInteger)value;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator Integer(long value)
+        {
+            return (BigInteger)value;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator Integer(ulong value)
+        {
+            return (BigInteger)value;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator Integer(BigInteger value)
+        {
+            return new Integer(value);
         }
     }
 }

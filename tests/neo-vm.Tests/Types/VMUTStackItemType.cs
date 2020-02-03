@@ -8,6 +8,11 @@ namespace Neo.Test.Types
         Null,
 
         /// <summary>
+        /// An address of function
+        /// </summary>
+        Pointer,
+
+        /// <summary>
         /// Boolean (true,false)
         /// </summary>
         Boolean,
@@ -21,6 +26,11 @@ namespace Neo.Test.Types
         /// ByteArray as UTF8 string
         /// </summary>
         String,
+
+        /// <summary>
+        /// Mutable byte array
+        /// </summary>
+        Buffer,
 
         /// <summary>
         /// String

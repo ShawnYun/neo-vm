@@ -1,22 +1,27 @@
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Neo.VM.Types
 {
-    [DebuggerDisplay("Type={GetType().Name}, Count={Count}")]
     public class Struct : Array
     {
-        public Struct() : this(new List<StackItem>()) { }
+        public override StackItemType Type => StackItemType.Struct;
 
-        public Struct(IEnumerable<StackItem> value) : base(value)
+        public Struct(IEnumerable<StackItem> value = null)
+            : this(null, value)
+        {
+        }
+
+        public Struct(ReferenceCounter referenceCounter, IEnumerable<StackItem> value = null)
+            : base(referenceCounter, value)
         {
         }
 
         public Struct Clone()
         {
-            Struct @struct = new Struct();
+            Struct result = new Struct(ReferenceCounter);
             Queue<Struct> queue = new Queue<Struct>();
-            queue.Enqueue(@struct);
+            queue.Enqueue(result);
             queue.Enqueue(this);
             while (queue.Count > 0)
             {
@@ -26,7 +31,7 @@ namespace Neo.VM.Types
                 {
                     if (item is Struct sb)
                     {
-                        Struct sa = new Struct();
+                        Struct sa = new Struct(ReferenceCounter);
                         a.Add(sa);
                         queue.Enqueue(sa);
                         queue.Enqueue(sb);
@@ -37,12 +42,19 @@ namespace Neo.VM.Types
                     }
                 }
             }
-            return @struct;
+            return result;
         }
 
-        public override bool Equals(StackItem other)
+        public override StackItem ConvertTo(StackItemType type)
         {
-            if (other is null) return false;
+            if (type == StackItemType.Array)
+                return new Array(ReferenceCounter, new List<StackItem>(_array));
+            return base.ConvertTo(type);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Struct other)) return false;
             Stack<StackItem> stack1 = new Stack<StackItem>();
             Stack<StackItem> stack2 = new Stack<StackItem>();
             stack1.Push(this);
@@ -67,6 +79,11 @@ namespace Neo.VM.Types
                 }
             }
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            throw new NotSupportedException();
         }
     }
 }
