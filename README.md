@@ -26,21 +26,9 @@
 </p>
 
 # NEO Virtual Machine
-
-
-## Table of Contents
-1. [Overview](#overview)
-2. [Project structure](#project-structure)
-3. [Related projects](#related-projects)
-4. [Bounty program](#bounty-program)
-5. [License](#license)
-
-
-## Overview
 This is the virtual machine of NEO: **NeoVM**.
 
 For detailed documentation, see [docs.neo.org](https://docs.neo.org/docs/en-us/index.html) and the [NEO whitepaper](https://docs.neo.org/docs/en-us/basic/whitepaper.html).
-
 
 
 ## Project structure
