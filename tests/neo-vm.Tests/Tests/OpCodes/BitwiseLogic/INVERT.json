@@ -435,7 +435,7 @@
       ]
     },
     {
-      "name": "Real test [ByteArray]=-11911212070228631137091015067172167745537",
+      "name": "Real test [ByteString]=-11911212070228631137091015067172167745537",
       "script": [
         "PUSHDATA1",
         "0x11",
@@ -455,7 +455,7 @@
                 "nextInstruction": "INVERT",
                 "evaluationStack": [
                   {
-                    "type": "byteArray",
+                    "type": "ByteString",
                     "value": "0x0000000000000000000000000000000123"
                   }
                 ]
@@ -500,7 +500,7 @@
       ]
     },
     {
-      "name": "Real test [ByteArray]=-12251494437149569600554389674603935956993",
+      "name": "Real test [ByteString]=-12251494437149569600554389674603935956993",
       "script": [
         "PUSHDATA1",
         "0x11",
@@ -520,7 +520,7 @@
                 "nextInstruction": "INVERT",
                 "evaluationStack": [
                   {
-                    "type": "byteArray",
+                    "type": "ByteString",
                     "value": "0x0000000000000000000000000000000124"
                   }
                 ]
@@ -606,11 +606,11 @@
       "name": "Real test [Buffer,Buffer]=FAULT",
       "script": [
         "PUSHDATA1",
-        "01AA",
+        "0x01AA",
         "CONVERT",
         "0x30",
         "PUSHDATA1",
-        "01BB",
+        "0x01BB",
         "CONVERT",
         "0x30",
         "INVERT"
@@ -632,11 +632,11 @@
                 "evaluationStack": [
                   {
                     "type": "Buffer",
-                    "value": "BB"
+                    "value": "0xBB"
                   },
                   {
                     "type": "Buffer",
-                    "value": "AA"
+                    "value": "0xAA"
                   }
                 ]
               }

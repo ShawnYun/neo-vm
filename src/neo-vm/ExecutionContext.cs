@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -6,30 +5,31 @@ using System.Runtime.CompilerServices;
 namespace Neo.VM
 {
     [DebuggerDisplay("RVCount={RVCount}, InstructionPointer={InstructionPointer}")]
-    public sealed class ExecutionContext
+    public sealed partial class ExecutionContext
     {
-        private readonly Dictionary<Type, object> states;
-
-        /// <summary>
-        /// Number of items to be returned
-        /// </summary>
-        internal int RVCount { get; }
+        private readonly SharedStates shared_states;
 
         /// <summary>
         /// Script
         /// </summary>
-        public Script Script { get; }
+        public Script Script => shared_states.Script;
 
         /// <summary>
         /// Evaluation stack
         /// </summary>
-        public EvaluationStack EvaluationStack { get; }
+        public EvaluationStack EvaluationStack => shared_states.EvaluationStack;
 
-        public Slot StaticFields { get; internal set; }
+        public Slot StaticFields
+        {
+            get => shared_states.StaticFields;
+            internal set => shared_states.StaticFields = value;
+        }
 
         public Slot LocalVariables { get; internal set; }
 
         public Slot Arguments { get; internal set; }
+
+        public Stack<ExceptionHandlingContext> TryStack { get; internal set; }
 
         /// <summary>
         /// Instruction pointer
@@ -62,22 +62,19 @@ namespace Neo.VM
         /// </summary>
         /// <param name="script">Script</param>
         /// <param name="rvcount">Number of items to be returned</param>
-        internal ExecutionContext(Script script, int rvcount, ReferenceCounter referenceCounter)
-            : this(script, rvcount, new EvaluationStack(referenceCounter), new Dictionary<Type, object>())
+        internal ExecutionContext(Script script, ReferenceCounter referenceCounter)
+            : this(new SharedStates(script, referenceCounter))
         {
         }
 
-        private ExecutionContext(Script script, int rvcount, EvaluationStack stack, Dictionary<Type, object> states)
+        private ExecutionContext(SharedStates shared_states)
         {
-            this.RVCount = rvcount;
-            this.Script = script;
-            this.EvaluationStack = stack;
-            this.states = states;
+            this.shared_states = shared_states;
         }
 
-        internal ExecutionContext Clone()
+        public ExecutionContext Clone()
         {
-            return new ExecutionContext(Script, 0, EvaluationStack, states) { StaticFields = StaticFields };
+            return new ExecutionContext(shared_states);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -85,10 +82,10 @@ namespace Neo.VM
 
         public T GetState<T>() where T : class, new()
         {
-            if (!states.TryGetValue(typeof(T), out object value))
+            if (!shared_states.States.TryGetValue(typeof(T), out object value))
             {
                 value = new T();
-                states[typeof(T)] = value;
+                shared_states.States[typeof(T)] = value;
             }
             return (T)value;
         }
